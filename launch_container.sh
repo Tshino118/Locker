@@ -6,5 +6,5 @@
 . ./setting
 
 # Launch repository
-docker run $container_run_args -it --name $container_name $repository_name:$repository_version
+docker run $container_run_args -it --gpus all --name $container_name $repository_name:$repository_version
 

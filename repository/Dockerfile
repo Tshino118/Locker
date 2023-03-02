@@ -1,5 +1,5 @@
 # ------------ ベースとなるイメージファイル
-FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
+FROM nvidia/cuda:11.7.0-devel-ubuntu22.04
 
 # ------------ 環境設定
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
@@ -35,9 +35,9 @@ RUN apt-get install git -y
  
 # matplotlibなどでの描画GUIに必要
 RUN apt-get install python3-tk -y
- 
-# PyTorchのためのライブラリをインストール
-RUN python3 -m pip install torch torchvision
+
+# PyTorch for cuda
+RUN python3 -m pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 -f https://download.pytorch.org/whl/torch_stable.html 
 
 ## # Opencv install. latest branch is 4.7.0 now.
 ## RUN apt-get update && \

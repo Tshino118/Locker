@@ -1,6 +1,6 @@
 # docker_setup.sh: Pulling base images
 # [Note] If you need to change base image that please edit Dockerfile.
-base_image="nvidia/cuda:11.8.0-devel-ubuntu22.04"
+base_image="nvidia/cuda:11.7.0-devel-ubuntu22.04"
 
 # repository_setup.sh: Building Docker repositroy
 repository_name="bc_resnet"
