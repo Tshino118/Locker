@@ -1,5 +1,5 @@
-# Launch ros2 container
-Launch ```bash setup.sh`` in prompt, you can use ros2-humble container.
+# Launch torch container
+Launch ```bash setup.sh`` in prompt.
 
 ## Edit setting
 Please edit setting file.

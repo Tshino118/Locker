@@ -21,7 +21,7 @@ function ask_yes_no {
 
 if ask_yes_no "Could you remove previous container?:"; then
     echo "Removing container...: $container_name"
-    bash $SCRIPT_DIR/remove_container.sh
+    bash $SCRIPT_DIR/docker_collapse_container.sh
 else
     echo "Skip removing container."
 fi
@@ -37,13 +37,13 @@ echo "repository version: $repository_version"
 echo "container name    : $container_name"
 
 echo "Set up dependent images."
-sh $SCRIPT_DIR/docker_setup.sh
+sh $SCRIPT_DIR/docker_pull_image.sh
 
-echo "Create Docker image for Ros2."
-sh $SCRIPT_DIR/repository_setup.sh
+echo "Create Docker image."
+sh $SCRIPT_DIR/docker_build_image.sh
 
 echo "Start container."
-sh $SCRIPT_DIR/launch_container.sh
+sh $SCRIPT_DIR/docker_run_container.sh
 
 echo "Check container status."
 docker ps

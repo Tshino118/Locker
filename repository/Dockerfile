@@ -1,59 +1,68 @@
-# ------------ ベースとなるイメージファイル
-FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
+ARG BASE_IMAGE="nvidia/cuda:11.7.0-devel-ubuntu22.04"
 
-# ------------ 環境設定
+# ------------ Setting baseimage
+FROM $BASE_IMAGE
+# ------------ Arguments
+ARG TIME_ZONE="Asia/Tokyo"
+ARG USER_NAME="locker"
+ARG HOME_DIR="/home/locker"
+
+ENV USER_NAME=$USER_NAME
+ENV HOME_DIR=$HOME_DIR
+
+# ------------ Setting enviroment
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 ENV DISPLAY host.docker.internal:0.0
 ENV DEBIAN_FRONTEND=noninteractive
 
-# ------------ タイムゾーンの設定
+# ------------ Setting timezone
 RUN apt-get update && apt-get install -y tzdata
-ENV TZ=Asia/Tokyo 
+ENV TZ=$TIME_ZONE 
 
-# ------------ Add User setting
-RUN apt-get update && apt-get install -y sudo
-ARG USERNAME=pi
-ARG GROUPNAME=pi
-ARG UID=1000
-ARG GID=1000
-ARG PASSWORD=pi
-RUN groupadd -g $GID $GROUPNAME && \
-    useradd -m -s /bin/bash -u $UID -g $GID -G sudo $USERNAME && \
-    echo $USERNAME:$PASSWORD | chpasswd && \
-    echo "$USERNAME   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-USER $USERNAME
-
-# ------------ ワークディレクトリの設定
-WORKDIR /home/$USERNAME/
- 
-# ------------ Ubuntu上での環境構築
+# ------------ Upgrade apt-get
 RUN apt-get update && apt-get upgrade -y
+
+WORKDIR /home
+
+# ------------ Build enviroment in Ubuntu
 RUN apt-get install -y python3 python3-pip && \
     apt-get install wget -y
 
 ## # windows上でx-serverに接続するために必要なx11-appsのインストール
 ## RUN apt-get install x11-apps -y
 
-# gitのインストール（20.04以降はデフォルトでインストールされていない）
+# Install git
 RUN apt-get install git -y
  
-# matplotlibなどでの描画GUIに必要
+# Install tk
 RUN apt-get install python3-tk -y
- 
-## # PyTorchのためのライブラリをインストール
-## RUN python3 -m pip install torch torchvision
 
-## # Opencv install. latest branch is 4.7.0 now.
-RUN apt-get update && \
-    apt-get install -y cmake g++ git && \
-    git clone -b 4.7.0 https://github.com/opencv/opencv.git /opt/opencv_4.7.0 && \
-    cd /opt/opencv_4.7.0 && \
-    mkdir -p build && cd build && \
-    cmake -D CMAKE_BUILD_TYPE=Release -D OPENCV_GENERATE_PKGCONFIG=ON -DWITH_V4L=ON -D WITH_FFMPEG=ON -D OPENCV_FFMPEG_USE_FIND_PACKAGE=ON -D BUILD_TESTS=ON -D BUILD_PERF_TESTS=OFF -D BUILD_opencv_calib3d=ON -D BUILD_opencv_dnn=OFF -D BUILD_opencv_features2d=ON -D BUILD_opencv_flann=ON -D BUILD_opencv_gapi=OFF -D BUILD_opencv_ml=ON -D BUILD_opencv_objdetect=ON -D BUILD_opencv_photo=ON -D BUILD_opencv_stitching=ON -D BUILD_opencv_video=ON -DCMAKE_INSTALL_PREFIX=/usr/local -D FORCE_VTK=ON -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON -D WITH_CUBLAS=ON -D CUDA_NVCC_FLAGS="-D_FORCE_INLINES" -D WITH_GDAL=ON -D WITH_XINE=ON -D BUILD_EXAMPLES=ON .. && \
-    make -j8 && \
-    make install && \
-    ldconfig
+# PyTorch for cuda
+# RUN python3 -m pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 -f https://download.pytorch.org/whl/torch_stable.html 
 
-# ------------ ROS2のセットアップ
-COPY setup.sh /opt
-RUN bash /opt/setup.sh
+## # Install Opencv. latest branch is 4.7.0 now.
+# RUN apt-get update && \
+#     apt-get install -y cmake g++ git && \
+#     git clone -b 4.7.0 https://github.com/opencv/opencv.git /opt/opencv_4.7.0 && \
+#     cd /opt/opencv_4.7.0 && \
+#     mkdir -p build && cd build && \
+#     cmake -D CMAKE_BUILD_TYPE=Release -D OPENCV_GENERATE_PKGCONFIG=ON -DWITH_V4L=ON -D WITH_FFMPEG=ON -D OPENCV_FFMPEG_USE_FIND_PACKAGE=ON -D BUILD_TESTS=ON -D BUILD_PERF_TESTS=OFF -D BUILD_opencv_calib3d=ON -D BUILD_opencv_dnn=OFF -D BUILD_opencv_features2d=ON -D BUILD_opencv_flann=ON -D BUILD_opencv_gapi=OFF -D BUILD_opencv_ml=ON -D BUILD_opencv_objdetect=ON -D BUILD_opencv_photo=ON -D BUILD_opencv_stitching=ON -D BUILD_opencv_video=ON -DCMAKE_INSTALL_PREFIX=/usr/local -D FORCE_VTK=ON -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON -D WITH_CUBLAS=ON -D CUDA_NVCC_FLAGS="-D_FORCE_INLINES" -D WITH_GDAL=ON -D WITH_XINE=ON -D BUILD_EXAMPLES=ON .. && \
+#     make -j8 && \
+#     make install && \
+#     ldconfig
+
+# ------------ Setting ROS2
+# COPY setup.sh /opt
+# RUN bash /opt/setup.sh
+
+# ------------ Add User setting
+# RUN adduser --home /home/locker locker && chown -R locker /home/locker
+# USER locker
+# WORKDIR $HOME_DIR
+RUN adduser --home $HOME_DIR $USER_NAME && chown -R $USER_NAME $HOME_DIR
+USER $USER_NAME
+WORKDIR $HOME_DIR
+
+RUN passwd $USER_NAME
+
+

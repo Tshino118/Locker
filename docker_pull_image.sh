@@ -5,6 +5,6 @@
 # Read repository setting variables
 . ./setting
 
-echo "==> Pulling $base_image now..."
-docker pull $base_image
+echo "==> Pulling $BASE_IMAGE now..."
+docker pull $BASE_IMAGE
 docker images

@@ -1,5 +1,6 @@
 # Get current path
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
+TIME_ZONE="Asia/Tokyo"
 
 # repository_setup.sh: Building Docker repositroy
 REPOSITORY_DIR=$SCRIPT_DIR/repository
