@@ -63,6 +63,3 @@ RUN adduser --home $HOME_DIR $USER_NAME && chown -R $USER_NAME $HOME_DIR
 USER $USER_NAME
 WORKDIR $HOME_DIR
 
-RUN passwd $USER_NAME
-
-

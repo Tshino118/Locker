@@ -36,14 +36,20 @@ echo "repository name   : $repository_name"
 echo "repository version: $repository_version"
 echo "container name    : $container_name"
 
-echo "Set up dependent images."
+echo -e "Set up dependent images.\n"
+echo "# docker_pull_image.sh #########################################################"
 sh $SCRIPT_DIR/docker_pull_image.sh
+echo -e"######################################################### docker_pull_image.sh #\n"
 
 echo "Create Docker image."
+echo "# docker_build_image.sh #########################################################"
 sh $SCRIPT_DIR/docker_build_image.sh
+echo -e "######################################################### docker_build_image.sh #\n"
 
 echo "Start container."
+echo "# docker_run_container.sh #########################################################"
 sh $SCRIPT_DIR/docker_run_container.sh
+echo -e "######################################################### docker_run_container.sh #\n"
 
 echo "Check container status."
 docker ps
