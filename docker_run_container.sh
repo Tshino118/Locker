@@ -6,4 +6,4 @@
 . ./setting
 
 # Launch repository
-docker run $container_run_args --name $container_name $repository_name:$repository_version su -c 'exec ps aux' $USER_NAME
+docker run $container_run_args --name $container_name $repository_name:$repository_version /bin/bash

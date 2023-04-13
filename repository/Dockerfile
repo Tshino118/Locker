@@ -5,6 +5,10 @@ FROM $BASE_IMAGE
 # ------------ Arguments
 ARG TIME_ZONE="Asia/Tokyo"
 
+# ------------ Setting password to root
+ARG ROOT_PASS="root"
+RUN echo 'root:${ROOT_PASS}' | chpasswd
+
 # ------------ Setting enviroment
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 ENV DISPLAY host.docker.internal:0.0
@@ -50,21 +54,31 @@ WORKDIR /home
 # COPY ros2_setup.sh /opt
 # RUN bash /opt/ros2_setup.sh
 
-# ------------ Install gosu
-# Don't user sudo comannd. 
-# When u need to use sudo, u can user gosu command 
-# e.g. gosu $USER_NAME mkdir dir
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y gosu; \
-	rm -rf /var/lib/apt/lists/*; \
-# verify that the binary works
-	gosu nobody true
+# ------------ Add locker user
+ENV LOCKER_UID=9999
+ENV LOCKER_GID=$LOCKER_UID
 
-# ------------ Add User setting
-ARG USER_NAME="locker"
-ARG HOME_DIR="/home/locker"
+# Create the user of locker
+RUN groupadd --gid $LOCKER_GID locker \
+    && useradd --uid $LOCKER_UID --gid $LOCKER_GID -m locker \
+    #
+    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo locker ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/locker \
+    && chmod 0440 /etc/sudoers.d/locker
+
+# ********************************************************
+# * Anything else you want to do like clean up goes here *
+# ********************************************************
+
+# [Optional] Set the default user. Omit if you want to keep the default as root.
+USER locker
+
+# ------------ Add Original User setting
+ARG USER_NAME="user"
+ARG HOME_DIR="/home/user"
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN sudo chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
