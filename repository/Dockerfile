@@ -5,10 +5,6 @@ FROM $BASE_IMAGE
 # ------------ Arguments
 ARG TIME_ZONE="Asia/Tokyo"
 
-# ------------ Setting password to root
-ARG ROOT_PASS="root"
-RUN echo 'root:${ROOT_PASS}' | chpasswd
-
 # ------------ Setting enviroment
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 ENV DISPLAY host.docker.internal:0.0
@@ -54,6 +50,10 @@ WORKDIR /home
 # COPY ros2_setup.sh /opt
 # RUN bash /opt/ros2_setup.sh
 
+# ------------ Setting password to root
+ARG ROOT_PASS="root"
+RUN echo 'root:${ROOT_PASS}' | chpasswd
+
 # ------------ Add locker user
 ENV LOCKER_UID=9999
 ENV LOCKER_GID=$LOCKER_UID
@@ -64,16 +64,17 @@ RUN groupadd --gid $LOCKER_GID locker \
     #
     # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
     && apt-get update \
-    && apt-get install -y sudo \
-    && echo locker ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/locker \
-    && chmod 0440 /etc/sudoers.d/locker
+    && apt-get install -y sudo
+
+# Change password
+RUN echo 'locker:locker' | chpasswd \
+    && usermod -G sudo locker
 
 # ********************************************************
 # * Anything else you want to do like clean up goes here *
 # ********************************************************
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
-USER locker
 
 # ------------ Add Original User setting
 ARG USER_NAME="user"
@@ -81,4 +82,6 @@ ARG HOME_DIR="/home/user"
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN sudo chmod +x /usr/local/bin/entrypoint.sh
+
+USER locker
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

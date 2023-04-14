@@ -12,8 +12,10 @@ echo "USER_NAME: ${USER_NAME}"
 echo "GROUP_NAME: ${GROUP_NAME}"
 # adduser --uid ${USER_ID} --home ${HOME_DIR} ${USER_NAME} && chown -R ${USER_NAME} ${HOME_DIR}
 sudo useradd -m $USER_NAME -u $USER_ID -s /bin/bash && sudo chown -R ${USER_NAME} ${HOME_DIR}
+
+echo -n "$USER_NAME New password "
 sudo passwd $USER_NAME
 
 sudo usermod -G sudo $USER_NAME
 sudo cat /etc/group | grep $USER_NAME
-echo "id:" | id
+su $USER_NAME | echo "id:" | id
