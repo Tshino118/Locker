@@ -52,23 +52,24 @@ WORKDIR /home
 
 # ------------ Setting password to root
 ARG ROOT_PASS="root"
-RUN echo 'root:${ROOT_PASS}' | chpasswd
+RUN echo 'root:root' | chpasswd
 
 # ------------ Add locker user
+ARG USER_NAME="locker"
 ENV LOCKER_UID=9999
 ENV LOCKER_GID=$LOCKER_UID
 
 # Create the user of locker
-RUN groupadd --gid $LOCKER_GID locker \
-    && useradd --uid $LOCKER_UID --gid $LOCKER_GID -m locker \
-    #
+RUN groupadd --gid $LOCKER_GID ${USER_NAME} \
+    && useradd --uid $LOCKER_UID --gid $LOCKER_GID -s /usr/bin/bash -m ${USER_NAME} \
     # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
     && apt-get update \
     && apt-get install -y sudo
 
 # Change password
-RUN echo 'locker:locker' | chpasswd \
-    && usermod -G sudo locker
+ARG USER_PASS="locker"
+RUN echo "${USER_NAME}":"${USER_PASS}" | chpasswd\
+    && usermod -G sudo ${USER_NAME}
 
 # ********************************************************
 # * Anything else you want to do like clean up goes here *
@@ -77,11 +78,10 @@ RUN echo 'locker:locker' | chpasswd \
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 
 # ------------ Add Original User setting
-ARG USER_NAME="user"
-ARG HOME_DIR="/home/user"
-
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN sudo chmod +x /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-USER locker
+USER ${USER_NAME}
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD ["/usr/bin/bash"]
