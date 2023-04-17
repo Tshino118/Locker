@@ -37,7 +37,7 @@ RUN python3 -m pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchau
 
 # Install Opencv. latest branch is 4.7.0 now.
 RUN apt-get update && \
-    apt-get install -y cmake g++ git && \
+    apt-get install -y cmake g++ git ffmpeg libsm6 libxext6 && \
     git clone -b 4.7.0 https://github.com/opencv/opencv.git /opt/opencv_4.7.0 && \
     cd /opt/opencv_4.7.0 && \
     mkdir -p build && cd build && \
@@ -45,6 +45,7 @@ RUN apt-get update && \
     make -j8 && \
     make install && \
     ldconfig
+    
 
 # ------------ Setting ROS2
 # COPY ros2_setup.sh /opt
