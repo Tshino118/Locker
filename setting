@@ -12,4 +12,4 @@ USER_NAME="cuda_torch_test"
 GROUP_NAME=$USER_NAME
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
-container_run_args="-v $SCRIPT_DIR/work:/opt/work --device=/dev/video0:/dev/video0 --device=/dev/video1:/dev/video1 -it --gpus all -e LOCAL_UID=$(id -u $USER) -e LOCAL_GID=$(id -g $USER) -e LOCAL_USER=$USER_NAME -e LOCAL_GROUP=$GROUP_NAME -e LOCAL_HOME=$HOME_DIR"
+container_run_args="-v $SCRIPT_DIR/work:/opt/work -v /tmp/.X11-unix/:/tmp/.X11-unix -e DISPLAY=$DISPLAY --device=/dev/video0:/dev/video0 --device=/dev/video1:/dev/video1 -it --gpus all -e LOCAL_UID=$(id -u $USER) -e LOCAL_GID=$(id -g $USER) -e LOCAL_USER=$USER_NAME -e LOCAL_GROUP=$GROUP_NAME -e LOCAL_HOME=$HOME_DIR"
