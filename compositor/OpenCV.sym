@@ -1,0 +1,12 @@
+ARG OPENCV_VERSION="4.7.0"
+
+# Install OpenCV. latest branch is $OPENCV_VERSION now.
+RUN apt-get update && \
+    apt-get install -y cmake g++ git ffmpeg libsm6 libxext6 && \
+    git clone -b $OPENCV_VERSION https://github.com/opencv/opencv.git /opt/opencv_$OPENCV_VERSION && \
+    cd /opt/opencv_$OPENCV_VERSION && \
+    mkdir -p build && cd build && \
+    cmake -D CMAKE_BUILD_TYPE=Release -D OPENCV_GENERATE_PKGCONFIG=ON -DWITH_V4L=ON -D WITH_FFMPEG=ON -D OPENCV_FFMPEG_USE_FIND_PACKAGE=ON -D BUILD_TESTS=ON -D BUILD_PERF_TESTS=OFF -D BUILD_opencv_calib3d=ON -D BUILD_opencv_dnn=OFF -D BUILD_opencv_features2d=ON -D BUILD_opencv_flann=ON -D BUILD_opencv_gapi=OFF -D BUILD_opencv_ml=ON -D BUILD_opencv_objdetect=ON -D BUILD_opencv_photo=ON -D BUILD_opencv_stitching=ON -D BUILD_opencv_video=ON -DCMAKE_INSTALL_PREFIX=/usr/local -D FORCE_VTK=ON -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON -D WITH_CUBLAS=ON -D CUDA_NVCC_FLAGS="-D_FORCE_INLINES" -D WITH_GDAL=ON -D WITH_XINE=ON -D BUILD_EXAMPLES=ON .. && \
+    make -j8 && \
+    make install && \
+    ldconfig

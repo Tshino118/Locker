@@ -1,0 +1,25 @@
+ARG ROS2_WORKSPACE="ros2_ws"
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    lsb-release \
+    python3-colcon-common-extensions \
+    v4l-utils
+# Add ROS 2 repository key
+RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+
+# Add ROS 2 repository to source list
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
+
+# Create a workspace and build
+RUN mkdir -p ~/$ROS2_WORKSPACE/src && cd ~/$ROS2_WORKSPACE && colcon build
+
+# Install ROS 2
+RUN apt-get update && apt-get install -y ros-humble-desktop python3-colcon-common-extensions
+
+# Add environment setup to .bashrc
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+
+# Install Gazebo and Gazebo-related packages
+RUN apt-get install -y gazebo ros-humble-gazebo-*

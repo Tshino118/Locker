@@ -27,10 +27,10 @@ RUN apt-get install -y python3 python3-pip && \
 ## RUN apt-get install x11-apps -y
 
 # Install git
-RUN apt-get install git -y
+RUN apt-get install -y git
  
 # Install tk
-RUN apt-get install python3-tk -y
+RUN apt-get install -y python3-tk
 
 # PyTorch for cuda
 RUN python3 -m pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 -f https://download.pytorch.org/whl/torch_stable.html 
